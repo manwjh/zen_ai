@@ -1,0 +1,37 @@
+Cursor Project Rules (English-first, bilingual where required) / Cursor 项目规则（英文优先，需要时双语）
+
+General / 通用
+- English is the primary language for all content and filenames.  
+  所有内容与文件名以英文为主。
+- Use ASCII only unless the file already uses non-ASCII.  
+  除非文件已使用非 ASCII，否则仅用 ASCII。
+- Keep tone concise, precise, and engineering-focused.  
+  语气简洁、准确、工程化。
+
+Documentation (Markdown) / 文档（Markdown）
+- English first, then Chinese on the next line or same line.  
+  英文在前，中文在后（同一行或下一行）。
+- Headings, lists, and paragraphs must be bilingual.  
+  标题、列表与段落必须双语。
+- Keep terminology consistent across EN/ZH.  
+  中英文术语保持一致。
+
+Scripts (Shell) / 脚本（Shell）
+- Comments and echo output must be bilingual (English first).  
+  注释与输出必须双语（英文优先）。
+- Use safe defaults: `set -euo pipefail` for bash scripts.  
+  Bash 脚本使用安全默认：`set -euo pipefail`。
+
+Code / 代码
+- Code identifiers, comments, and strings are English only.  
+  代码中的标识符、注释与字符串仅使用英文。
+- Prefer clear, explicit naming over abbreviations.  
+  命名清晰明确，避免缩写。
+- Add short comments only when logic is non-obvious.  
+  仅在逻辑不直观时添加简短注释。
+
+File Naming / 文件命名
+- Use English, kebab-case for docs: `design-spec_v0.1.md`.  
+  文档使用英文与 kebab-case：`design-spec_v0.1.md`。
+- Avoid non-ASCII characters in paths.  
+  路径中避免非 ASCII 字符。
