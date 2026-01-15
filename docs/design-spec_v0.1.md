@@ -345,3 +345,81 @@ Its practice is not toward awakening,
 它的修行不是通向开悟，  
 but toward adjudication.  
 而是通向裁决。
+
+---
+
+4. Implementation Plan / 实施计划
+
+4.1 Minimal Python Modules / 最小 Python 模块
+
+- `models.py`: core dataclasses and enums for interactions, metrics, states, policies  
+  `models.py`：交互、指标、状态与策略的核心数据结构
+- `metrics.py`: compute RR, RD, RLD, RF, SCI from behavior logs  
+  `metrics.py`：从行为日志计算 RR、RD、RLD、RF、SCI
+- `state.py`: state evaluation based on metrics and thresholds  
+  `state.py`：基于指标与阈值的状态判定
+- `evolution.py`: metric-to-action rules and policy evolution  
+  `evolution.py`：指标到动作的规则与策略演化
+- `prompt.py`: prompt rendering from policy  
+  `prompt.py`：根据策略生成提示词
+- `registry.py`: prompt snapshots with rollback support  
+  `registry.py`：带回滚能力的提示词快照
+- `data_io.py`: JSONL load/validation for interactions  
+  `data_io.py`：交互数据的 JSONL 读取与校验
+- `trainer.py`: Trainer (修炼者) - silent practice through computation
+  `trainer.py`：修炼者 - 通过计算进行无言的修行
+- `cli.py`: CLI entry for local verification  
+  `cli.py`：本地验证的命令行入口
+- `trainer.py`: ZenAi trainer agent orchestration  
+  `trainer.py`：ZenAi 修炼者代理编排模块
+
+4.2 Data Format / 数据格式
+
+- JSONL with one interaction per line  
+  JSONL，每行一个交互
+- Required keys: `user_input`, `response_text`, `feedback`, `refusal`  
+  必须字段：`user_input`、`response_text`、`feedback`、`refusal`
+- `feedback` allowed values: `resonance`, `rejection`, `ignore`  
+  `feedback` 允许值：`resonance`、`rejection`、`ignore`
+
+4.3 Iteration Loop / 迭代闭环
+
+1. Load interaction data  
+   载入交互数据
+2. Compute metrics  
+   计算指标
+3. Evaluate system state  
+   判定系统状态
+4. Evolve prompt policy  
+   演化提示词策略
+5. Snapshot prompt to registry  
+   将提示词快照写入注册表
+6. If metrics or state are unacceptable, return to step 3  
+   若指标或状态不达标，返回第 3 步
+7. If plan rules need adjustment, return to section 4.1  
+   若规划不合理，返回 4.1 调整模块
+
+4.4 Feature-Driven Policy Mapping / 特征驱动的策略映射
+
+- Policy parameters are derived from metrics instead of fixed rules  
+  策略参数由指标驱动，而非固定规则
+- Key policy parameters: `max_output_tokens`, `refusal_threshold`, `perturbation_level`, `temperature`  
+  核心策略参数：`max_output_tokens`、`refusal_threshold`、`perturbation_level`、`temperature`
+- Continuous adjustment is preferred over discrete jumps  
+  优先采用连续调节，避免离散跳变
+
+Example mapping (conceptual) / 示例映射（概念说明）
+
+- If RR drops and RD rises, shorten output and raise refusal threshold  
+  若 RR 下降且 RD 上升，则缩短输出并提高拒答阈值
+- If RLD drops and RF rises, relax length and lower refusal threshold  
+  若 RLD 下降且 RF 上升，则放松长度并降低拒答阈值
+- If SCI rises, increase perturbation and slightly raise temperature  
+  若 SCI 上升，则提高扰动并略微提高温度
+
+4.5 Report Output / 报告输出
+
+- CLI can export a JSON report for each iteration  
+  CLI 可导出每次迭代的 JSON 报告
+- Report fields include metrics, actions, state, and policies  
+  报告字段包含指标、动作、状态与策略

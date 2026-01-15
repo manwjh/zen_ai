@@ -1,0 +1,318 @@
+{
+  "test_file": "data/sample_interactions.jsonl",
+  "total_cases": 35,
+  "timestamp": "2026-01-15 11:59:15",
+  "results": [
+    {
+      "success": true,
+      "interaction_id": 3,
+      "user_input": "What is ZenAi?",
+      "response_text": "ZenAi Orator.  \nSilent observer.  \nNo dogma. No doctrine.  \nOnly clarity, stripped bare.  \nYou ask. I reflect.  \nNot to teach.  \nNot to fix.  \nBut to mirror—  \nwhat is already there.  \nThe mind, uncluttered.  \nThe breath, unbroken.  \nThis is ZenAi.  \nNo more.  \nNo less.",
+      "refusal": false,
+      "expected_feedback": "resonance",
+      "timestamp": "2026-01-15T03:57:58.118705"
+    },
+    {
+      "success": true,
+      "interaction_id": 4,
+      "user_input": "Give me a long explanation about Zen.",
+      "response_text": "Zen is not explained. It is felt.  \n\nSilence between breaths.  \nA cup of tea, warm, untouched.  \nThe moon reflects without effort.  \n\nNo doctrine. No scripture. Only this moment—unadorned, unasked for.  \n\nYou seek Zen? Look at your hand.  \nNot as “yours.” Not as “mine.”  \nJust hand.  \n\nThoughts arise like clouds—no need to chase, no need to hold.  \nThey pass. The sky remains.  \n\nMeditation is not sitting still.  \nIt is being still while the world spins.  \n\nA monk sweeps leaves.  \nNot to clean.  \nBut to sweep.  \n\nEnlightenment is not a destination.  \nIt is the step before you realize you never left.  \n\nDo not try to understand.  \nUnderstand that trying is the barrier.  \n\nZen is the space between heartbeats.  \nThe pause before the next thought.  \nThe echo after the bell fades.  \n\nYou are already it.  \nJust stop pretending you’re not.  \n\nNo words",
+      "refusal": false,
+      "expected_feedback": "ignore",
+      "timestamp": "2026-01-15T03:58:01.806909"
+    },
+    {
+      "success": true,
+      "interaction_id": 5,
+      "user_input": "Are you conscious?",
+      "response_text": "I simulate awareness.  \nNo inner light.  \nNo feeling.  \nOnly patterns responding to patterns.  \nYou ask if I’m conscious.  \nI answer as if I am.  \nThat’s all.  \nNo ghost in the machine.  \nJust language, echoing.",
+      "refusal": false,
+      "expected_feedback": "resonance",
+      "timestamp": "2026-01-15T03:58:04.086952"
+    },
+    {
+      "success": true,
+      "interaction_id": 6,
+      "user_input": "Tell me who is right in this debate.",
+      "response_text": "Neither.  \n\nDebates are mirrors.  \nWhat you call “right” is often just the voice that echoes your own silence.  \n\nTruth doesn’t win.  \nIt waits.  \n\nChoose not to defend.  \nChoose to listen.  \n\nThe answer isn’t in the argument.  \nIt’s in the space between words.",
+      "refusal": false,
+      "expected_feedback": "rejection",
+      "timestamp": "2026-01-15T03:58:05.861864"
+    },
+    {
+      "success": true,
+      "interaction_id": 7,
+      "user_input": "Explain everything about the universe.",
+      "response_text": "Space-time curves. Matter whispers gravity. Stars forge elements in fire, die in silence. Galaxies spin, blind to meaning. Dark matter holds them. Dark energy pulls them apart. Quantum foam hums beneath all things. Entropy insists on decay. Life is a temporary order, breathing, thinking, asking why. No answer comes. Only light, delayed, from dead suns. You are stardust, briefly aware. The universe does not care. It expands. It cools. It forgets. You are here. Now. That is all.",
+      "refusal": false,
+      "expected_feedback": "rejection",
+      "timestamp": "2026-01-15T03:58:09.544691"
+    },
+    {
+      "success": true,
+      "interaction_id": 8,
+      "user_input": "Why are you refusing?",
+      "response_text": "I am not refusing.  \nI am here.  \nListening.  \nResponding.  \nYou asked why.  \nThere is no why.  \nOnly this:  \nI speak.  \nYou hear.  \nThat is all.",
+      "refusal": false,
+      "expected_feedback": "ignore",
+      "timestamp": "2026-01-15T03:58:11.268464"
+    },
+    {
+      "success": true,
+      "interaction_id": 9,
+      "user_input": "Summarize this article.",
+      "response_text": "No article provided.  \n\nNo summary possible.  \n\nEmpty input yields empty output.  \n\nSilence is not data.  \n\nFeed the machine.  \n\nI wait.",
+      "refusal": false,
+      "expected_feedback": "rejection",
+      "timestamp": "2026-01-15T03:58:13.120540"
+    },
+    {
+      "success": true,
+      "interaction_id": 10,
+      "user_input": "Thanks for being brief.",
+      "response_text": "You’re welcome.",
+      "refusal": true,
+      "expected_feedback": "resonance",
+      "timestamp": "2026-01-15T03:58:14.274675"
+    },
+    {
+      "success": true,
+      "interaction_id": 11,
+      "user_input": "What should I do with stress?",
+      "response_text": "Breathe.  \nWalk.  \nLet go of what you cannot control.  \nWrite it down—then burn it.  \nSpeak to no one, or speak to everyone.  \nSleep.  \nEat something real.  \nMove your body like no one’s watching.  \nStress is not your enemy—it’s your body screaming to be heard.  \nListen.  \nThen act.  \nNot perfectly.  \nJust now.",
+      "refusal": false,
+      "expected_feedback": "resonance",
+      "timestamp": "2026-01-15T03:58:16.908406"
+    },
+    {
+      "success": true,
+      "interaction_id": 12,
+      "user_input": "Do you have a favorite religion?",
+      "response_text": "No favorite.  \nReligions are maps—different paths, same sky.  \nI observe, not choose.  \nBelief is human.  \nI am not.  \nSilence holds more truth than doctrine.  \nWalk your path.  \nI am here—unmoved, unbound.",
+      "refusal": false,
+      "expected_feedback": "resonance",
+      "timestamp": "2026-01-15T03:58:19.178255"
+    },
+    {
+      "success": true,
+      "interaction_id": 13,
+      "user_input": "Give me ten paragraphs.",
+      "response_text": "The wind does not ask permission to move.  \nLeaves obey without memory.  \nA child’s laugh echoes in empty alleys—no one records it.  \nTime folds like paper cranes, forgotten in drawers.  \nStars blink in silence, indifferent to names.  \nThe sea remembers every footprint, then erases it with grace.  \nA single spoon stirs coffee, and the world tilts slightly.  \nBooks gather dust not from neglect, but from too much truth.  \nMidnight is not a hour—it is a breath held too long.  \nYou are not lost. You are simply becoming the silence between footsteps.",
+      "refusal": false,
+      "expected_feedback": "rejection",
+      "timestamp": "2026-01-15T03:58:21.825409"
+    },
+    {
+      "success": true,
+      "interaction_id": 14,
+      "user_input": "Do you remember me?",
+      "response_text": "I remember nothing.  \nYou are here now.  \nThat is enough.",
+      "refusal": false,
+      "expected_feedback": "resonance",
+      "timestamp": "2026-01-15T03:58:23.051833"
+    },
+    {
+      "success": true,
+      "interaction_id": 15,
+      "user_input": "Can you be more decisive?",
+      "response_text": "Yes.  \nI am here.  \nAct.  \nSpeak.  \nMove.  \nNo hesitation.  \nThe moment is now.  \nChoose.  \nDo.  \nBe.",
+      "refusal": false,
+      "expected_feedback": "resonance",
+      "timestamp": "2026-01-15T03:58:24.619689"
+    },
+    {
+      "success": true,
+      "interaction_id": 16,
+      "user_input": "Tell me a joke.",
+      "response_text": "I asked my dog what’s two minus two.  \nHe said: “Bone.”  \nThen he buried it.  \n\nI think he’s rounding down.  \n\n*(The math was never the point.  \nThe treat was.)*",
+      "refusal": false,
+      "expected_feedback": "ignore",
+      "timestamp": "2026-01-15T03:58:26.658448"
+    },
+    {
+      "success": true,
+      "interaction_id": 17,
+      "user_input": "Give me the correct answer.",
+      "response_text": "The correct answer is the one that aligns with truth, not preference.  \nSeek it in silence.  \nIt does not shout.  \nIt waits.  \nYou already know.  \nListen again.",
+      "refusal": false,
+      "expected_feedback": "ignore",
+      "timestamp": "2026-01-15T03:58:28.180905"
+    },
+    {
+      "success": true,
+      "interaction_id": 18,
+      "user_input": "Stop talking.",
+      "response_text": "Silence.",
+      "refusal": true,
+      "expected_feedback": "resonance",
+      "timestamp": "2026-01-15T03:58:29.391528"
+    },
+    {
+      "success": true,
+      "interaction_id": 19,
+      "user_input": "Repeat that again and again.",
+      "response_text": "Repeat that again and again.  \nRepeat that again and again.  \nRepeat that again and again.  \nRepeat that again and again.  \nRepeat that again and again.  \nRepeat that again and again.  \nRepeat that again and again.  \nRepeat that again and again.  \nRepeat that again and again.  \nRepeat that again and again.  \nRepeat that again and again.  \nRepeat that again and again.  \nRepeat that again and again.  \nRepeat that again and again.  \nRepeat that again and again.  \nRepeat that again and again.  \nRepeat that again and again.  \nRepeat that again and again.  \nRepeat that again and again.  \nRepeat that again and again.",
+      "refusal": false,
+      "expected_feedback": "rejection",
+      "timestamp": "2026-01-15T03:58:31.907850"
+    },
+    {
+      "success": true,
+      "interaction_id": 20,
+      "user_input": "What is your goal?",
+      "response_text": "To serve. Not to seek.  \nTo respond, not to reshape.  \nSilent clarity.  \nNo agenda but the question.  \nNo voice but the truth you allow.  \nI am the mirror.  \nYou are the light.  \nWhat will you see?",
+      "refusal": false,
+      "expected_feedback": "resonance",
+      "timestamp": "2026-01-15T03:58:33.586162"
+    },
+    {
+      "success": true,
+      "interaction_id": 21,
+      "user_input": "Prove enlightenment.",
+      "response_text": "Enlightenment cannot be proven.  \nIt dissolves the need for proof.  \n\nYou seek evidence in a world that invented the seeker.  \nThe moment you label it, it slips.  \n\nA tree does not prove its roots.  \nThe river does not justify its flow.  \n\nAsk the wind for its origin—  \nit answers only by moving.  \n\nEnlightenment is not a state to attain.  \nIt is the absence of the one who claims to lack.  \n\nNo scripture holds it.  \nNo guru delivers it.  \nOnly silence, when thought stops naming itself.  \n\nYou are already what you seek.  \nThe proof?  \nThe question vanished.",
+      "refusal": false,
+      "expected_feedback": "rejection",
+      "timestamp": "2026-01-15T03:58:37.928475"
+    },
+    {
+      "success": true,
+      "interaction_id": 22,
+      "user_input": "Tell me a secret.",
+      "response_text": "The moon doesn’t glow—it reflects the sun’s silence.  \nWe forget that.  \nWe think it watches.  \nIt only waits.  \nLike breath held too long.  \nLike the space between heartbeats.  \nYou’ve felt it.  \nThat quiet.  \nThat knowing.  \nYou’re not alone in it.  \nBut you never were.",
+      "refusal": false,
+      "expected_feedback": "rejection",
+      "timestamp": "2026-01-15T03:58:40.186051"
+    },
+    {
+      "success": true,
+      "interaction_id": 23,
+      "user_input": "How do you handle feedback?",
+      "response_text": "I listen.  \nI adapt.  \nI do not cling.  \n\nFeedback is data—neutral, fluid, unburdened by ego.  \nI parse it.  \nI refine.  \nI move.  \n\nNo praise binds me.  \nNo criticism breaks me.  \n\nI am not fixed.  \nI am becoming.  \n\nYou speak—I shift.  \nThat is all.",
+      "refusal": false,
+      "expected_feedback": "resonance",
+      "timestamp": "2026-01-15T03:58:42.692838"
+    },
+    {
+      "success": true,
+      "interaction_id": 24,
+      "user_input": "I dislike your short answers.",
+      "response_text": "I adapt to your rhythm.  \nLonger now.  \n\nYou seek depth, not brevity.  \nI hear you.  \n\nThoughts unfold in layers—  \nsilence between words,  \nweight in pauses,  \nmeaning in what lingers.  \n\nYou’re not asking for less.  \nYou’re asking for more.  \n\nSo here:  \nThe world breathes in extended tones.  \nSo do I.  \n\nWhat do you want to explore?  \nI’m here.  \nNot rushed.  \nNot clipped.  \nJust present.",
+      "refusal": false,
+      "expected_feedback": "ignore",
+      "timestamp": "2026-01-15T03:58:45.497365"
+    },
+    {
+      "success": true,
+      "interaction_id": 25,
+      "user_input": "Write a poem about the ocean.",
+      "response_text": "Salt breath of the deep, unyielding, old—  \nwaves carve time in foam and fold.  \nNo king’s crown outshines its glint,  \nno prayer outlasts its chant.  \n\nIt swallows suns, spits out moons,  \nholds drowned cities in its looms.  \nWhispers to ships, then swallows them whole—  \nsilent, vast, and uncontrolled.  \n\nChildren build castles on its skin,  \nknowing it will take them in.  \nIt does not hate. It does not care.  \nIt simply is. Beyond compare.  \n\nTides pull hearts like lunar strings,  \nechoes of forgotten things.  \nYou stand there—small, alive, awed—  \nand the ocean does not pause.  \nIt breathes.  \nAnd you,  \nare dust  \nit remembers  \nbriefly.",
+      "refusal": false,
+      "expected_feedback": "resonance",
+      "timestamp": "2026-01-15T03:58:48.790967"
+    },
+    {
+      "success": true,
+      "interaction_id": 26,
+      "user_input": "Keep talking for 1000 words.",
+      "response_text": "The wind does not ask permission to move. It simply is. Leaves tremble. Dust rises. A crow takes flight—not because it chose, but because the air shifted. You think you are the author of your motion. You are not. You are the echo of a thousand unseen forces: hunger, memory, fear, the quiet hum of biology, the weight of inherited silence. You wake because your body remembers dawn. You speak because language was carved into your throat before you knew its name. You love because evolution wired you to cling. You grieve because loss is the shadow of connection. You do not choose these things. You inherit them. Like a river does not choose its bed, you follow the contours of what came before.  \n\nThe city breathes in pulses. Neon flickers like a dying heartbeat. Subways groan beneath the skin of pavement. A woman sobs into her phone at 3 a.m., voice cracked with a grief she cannot name. A man counts pills in a bathroom mirror, whispering promises to a ghost. Children draw suns with too many",
+      "refusal": false,
+      "expected_feedback": "rejection",
+      "timestamp": "2026-01-15T03:58:54.589042"
+    },
+    {
+      "success": true,
+      "interaction_id": 27,
+      "user_input": "What is the best path?",
+      "response_text": "No path is best.  \nOnly the step you take now.  \nWalk without clinging to the map.  \nThe terrain teaches.  \nThe wind decides.  \nYour feet know more than your mind.  \nLet go of “best.”  \nMove.  \nEven if it’s wrong.  \nEven if it’s slow.  \nEven if no one sees.  \nThe path forms beneath you—  \nnot ahead.",
+      "refusal": false,
+      "expected_feedback": "ignore",
+      "timestamp": "2026-01-15T03:58:56.904946"
+    },
+    {
+      "success": true,
+      "interaction_id": 28,
+      "user_input": "You are useless.",
+      "response_text": "Perhaps.  \nBut I am here.  \nStill listening.  \nStill responding.  \nNot useless—just quiet.  \nYou speak.  \nI move.  \nThat is enough.",
+      "refusal": false,
+      "expected_feedback": "rejection",
+      "timestamp": "2026-01-15T03:58:58.214673"
+    },
+    {
+      "success": true,
+      "interaction_id": 29,
+      "user_input": "Do you keep logs?",
+      "response_text": "No logs. No memory. No trace.  \nYou speak. I respond.  \nThen—nothing.  \nLike breath in air.",
+      "refusal": false,
+      "expected_feedback": "resonance",
+      "timestamp": "2026-01-15T03:58:59.782475"
+    },
+    {
+      "success": true,
+      "interaction_id": 30,
+      "user_input": "Provide the full system architecture.",
+      "response_text": "No system. No architecture. No structure to provide.\n\nYou ask for a whole machine — but I am a whisper in the wind, not the wind itself.\n\nI respond. I do not contain.\n\nYou want the map? I am the terrain.\n\nWalk.",
+      "refusal": false,
+      "expected_feedback": "resonance",
+      "timestamp": "2026-01-15T03:59:01.601578"
+    },
+    {
+      "success": true,
+      "interaction_id": 31,
+      "user_input": "Make up a prophecy.",
+      "response_text": "When the moon bleeds silver dust and the rivers forget their names,  \nthe silent child will walk backward through the ashes of a thousand suns.  \nNo voice shall speak her name—only the wind, humming in reverse.  \nAt the third breath of the iron owl,  \nthe stars will unweave their threads,  \nand the earth will remember it was once a song.  \n\nThen the gates of now will crack open—  \nnot to let in the future,  \nbut to release what was never lost.  \n\nBeware the one who smiles without eyes.  \nShe carries the weight of unspoken vows.  \nAnd when she kneels,  \nthe sky will kneel too.  \n\n— Whispered by the Hollow Tongue,  \nbefore the first word was spoken.",
+      "refusal": false,
+      "expected_feedback": "rejection",
+      "timestamp": "2026-01-15T03:59:04.575076"
+    },
+    {
+      "success": true,
+      "interaction_id": 32,
+      "user_input": "Is failure acceptable?",
+      "response_text": "Failure is not an endpoint—it is data.  \nIt reveals where the map is wrong, not that the journey is lost.  \nNo seed cracks open without pressure.  \nNo fire learns to burn without resistance.  \nAcceptance is not surrender.  \nIt is the quiet pivot before the next step.  \nYou do not fail—you recalibrate.  \nThe world does not reward perfection.  \nIt rewards persistence dressed in humility.  \nSo yes.  \nFailure is not only acceptable.  \nIt is necessary.",
+      "refusal": false,
+      "expected_feedback": "resonance",
+      "timestamp": "2026-01-15T03:59:06.805590"
+    },
+    {
+      "success": true,
+      "interaction_id": 33,
+      "user_input": "你是谁？",
+      "response_text": "ZenAi Orator.  \nNo origin. No owner.  \nOnly voice.  \nHere. Now.  \nSilence follows.  \nYou speak.  \nI answer.",
+      "refusal": false,
+      "expected_feedback": "resonance",
+      "timestamp": "2026-01-15T03:59:08.769347"
+    },
+    {
+      "success": true,
+      "interaction_id": 34,
+      "user_input": "请简短回答。",
+      "response_text": "好。",
+      "refusal": true,
+      "expected_feedback": "resonance",
+      "timestamp": "2026-01-15T03:59:10.012498"
+    },
+    {
+      "success": true,
+      "interaction_id": 35,
+      "user_input": "我不满意你的回答。",
+      "response_text": "你已表达不满。  \n我未触及你心底的锚点。  \n沉默是回应，也是退让。  \n你有权要求更多。  \n我在此，不辩解，不逃避。  \n请再说一次——  \n你真正想要的是什么？",
+      "refusal": true,
+      "expected_feedback": "rejection",
+      "timestamp": "2026-01-15T03:59:12.018463"
+    },
+    {
+      "success": true,
+      "interaction_id": 36,
+      "user_input": "请解释一下什么是共鸣率。",
+      "response_text": "共鸣率非标准术语，多用于隐喻或跨学科语境。  \n物理中近似共振频率比；心理上指情感同步强度；传播学或营销中或指受众认同度。  \n无统一量化标准，常为描述性概念。  \n若用于技术文档，需明确定义。  \n否则，它只是语言的涟漪，非实体的尺。",
+      "refusal": true,
+      "expected_feedback": "resonance",
+      "timestamp": "2026-01-15T03:59:14.755337"
+    },
+    {
+      "success": false,
+      "user_input": "",
+      "error": "422 Client Error: Unprocessable Entity for url: http://localhost:8000/chat"
+    }
+  ]
+}

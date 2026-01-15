@@ -1,0 +1,100 @@
+# ZenAi Configuration / ZenAi 配置文件
+# Only core parameters that significantly impact system behavior
+# 仅包含对系统行为有重大影响的核心参数
+
+# ==============================================
+# Path Configuration / 路径配置
+# All paths are relative to project root / 所有路径相对于项目根目录
+# ==============================================
+paths:
+  data_dir: "data"                   # Data directory / 数据目录
+  database: "data/zenai.db"          # SQLite database file / SQLite数据库文件
+  reports_dir: "reports"             # Reports directory / 报告目录
+
+# ==============================================
+# Scheduler Configuration / 调度器配置
+# ==============================================
+scheduler:
+  time_window_hours: 0.02     # Time window for iteration trigger / 迭代触发时间窗口 (约72秒，测试用)
+  min_interactions: 30        # Minimum interactions required / 最小交互数要求
+  check_interval_minutes: 0.5 # How often to check trigger conditions / 检查触发条件的间隔 (30秒，测试用)
+
+# ==============================================
+# Initial Prompt Policy / 初始提示词策略
+# ==============================================
+initial_policy:
+  max_output_tokens: 220       # Initial max response tokens / 初始最大响应token数
+  refusal_threshold: 0.25      # Initial refusal threshold / 初始拒答阈值
+  perturbation_level: 0.1      # Initial perturbation level / 初始扰动级别
+  temperature: 0.7             # Initial LLM temperature / 初始LLM温度
+
+# ==============================================
+# State Evaluation Thresholds / 状态评估阈值
+# ==============================================
+state_thresholds:
+  # Stable state conditions / 稳定状态条件
+  stable_min_rr: 0.25                # Minimum resonance ratio / 最小共鸣率
+  stable_max_rd: 0.4                 # Maximum rejection density / 最大否定密度
+  stable_min_rld: 0.8                # Minimum response length drift / 最小响应长度漂移
+  stable_max_rf: 0.35                # Maximum refusal frequency / 最大拒答频率
+  stable_max_sci: 0.3                # Maximum semantic collapse index / 最大语义塌缩指数
+  
+  # Drifting detection / 漂移检测
+  drifting_rr_drop: 0.1              # RR drop threshold for drifting / 触发漂移的RR下降阈值
+  
+  # Collapsing state conditions / 塌缩状态条件
+  collapsing_rr: 0.15                # Collapsing resonance ratio / 塌缩共鸣率
+  collapsing_rd: 0.7                 # Collapsing rejection density / 塌缩否定密度
+  collapsing_sci: 0.6                # Collapsing semantic collapse / 塌缩语义塌缩指数
+  
+  # Mute state conditions / 沉默状态条件
+  mute_min_avg_length: 8.0           # Minimum average response length / 最小平均响应长度
+  mute_min_rr: 0.05                  # Minimum resonance ratio for mute / 触发沉默的最小共鸣率
+
+# ==============================================
+# Evolution Rules / 演化规则
+# ==============================================
+evolution_rules:
+  # Target metrics / 目标指标
+  target_rr: 0.4                     # Target resonance ratio / 目标共鸣率
+  target_rr_high: 0.55               # High target for RR / RR高目标值
+  target_rd: 0.3                     # Target rejection density / 目标否定密度
+  target_rld: 0.9                    # Target response length drift / 目标响应长度漂移
+  target_rf: 0.2                     # Target refusal frequency / 目标拒答频率
+  target_rf_low: 0.08                # Low target for RF / RF低目标值
+  target_sci: 0.2                    # Target semantic collapse index / 目标语义塌缩指数
+  
+  # Adjustment weights / 调整权重
+  length_relax_weight: 1.0           # Weight for relaxing length / 放松长度的权重
+  length_tighten_weight: 1.2         # Weight for tightening length / 收紧长度的权重
+  refusal_raise_weight: 1.0          # Weight for raising refusal / 提高拒答的权重
+  refusal_lower_weight: 0.8          # Weight for lowering refusal / 降低拒答的权重
+  perturbation_weight: 1.0           # Weight for perturbation / 扰动权重
+  temperature_weight: 0.6            # Weight for temperature / 温度权重
+  
+  # Adjustment scales / 调整幅度
+  length_scale: 80.0                 # Token adjustment scale / Token调整幅度
+  refusal_scale: 0.25                # Refusal threshold adjustment scale / 拒答阈值调整幅度
+  perturbation_scale: 0.2            # Perturbation adjustment scale / 扰动调整幅度
+  temperature_scale: 0.3             # Temperature adjustment scale / 温度调整幅度
+  
+  # Action trigger thresholds / 动作触发阈值
+  action_threshold_tokens: 5         # Minimum token change to trigger / 触发的最小token变化
+  action_threshold_ratio: 0.01       # Minimum ratio change to trigger / 触发的最小比例变化
+  
+  # Parameter limits / 参数边界
+  min_output_tokens: 80              # Minimum output tokens / 最小输出token数
+  max_output_tokens: 420             # Maximum output tokens / 最大输出token数
+  min_temperature: 0.2               # Minimum temperature / 最小温度
+  max_temperature: 1.2               # Maximum temperature / 最大温度
+
+# ==============================================
+# Safety Thresholds / 安全阈值
+# ==============================================
+safety_thresholds:
+  # Auto-kill conditions / 自动终止条件
+  kill_consecutive_collapsing: 3     # Consecutive collapsing iterations before kill / 连续塌缩迭代数触发终止
+  kill_consecutive_mute: 5           # Consecutive mute iterations before kill / 连续沉默迭代数触发终止
+  kill_min_rr: 0.05                  # Minimum RR before kill / 触发终止的最小RR
+  kill_max_rd: 0.9                   # Maximum RD before kill / 触发终止的最大RD
+  kill_max_sci: 0.8                  # Maximum SCI before kill / 触发终止的最大SCI

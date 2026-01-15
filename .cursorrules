@@ -1,37 +1,41 @@
-Cursor Project Rules (English-first, bilingual where required) / Cursor 项目规则（英文优先，需要时双语）
+Cursor Project Rules
 
-General / 通用
-- English is the primary language for all content and filenames.  
-  所有内容与文件名以英文为主。
-- Use ASCII only unless the file already uses non-ASCII.  
-  除非文件已使用非 ASCII，否则仅用 ASCII。
-- Keep tone concise, precise, and engineering-focused.  
-  语气简洁、准确、工程化。
+General
+- English is the primary language for all content and filenames.
+- Use ASCII only unless the file already uses non-ASCII.
+- Keep tone concise, precise, and engineering-focused.
 
-Documentation (Markdown) / 文档（Markdown）
-- English first, then Chinese on the next line or same line.  
-  英文在前，中文在后（同一行或下一行）。
-- Headings, lists, and paragraphs must be bilingual.  
-  标题、列表与段落必须双语。
-- Keep terminology consistent across EN/ZH.  
-  中英文术语保持一致。
+Documentation (Markdown)
+- Use English for all documentation.
+- Keep terminology consistent.
 
-Scripts (Shell) / 脚本（Shell）
-- Comments and echo output must be bilingual (English first).  
-  注释与输出必须双语（英文优先）。
-- Use safe defaults: `set -euo pipefail` for bash scripts.  
-  Bash 脚本使用安全默认：`set -euo pipefail`。
+Scripts (Shell)
+- Comments and echo output in English.
+- Use safe defaults: `set -euo pipefail` for bash scripts.
 
-Code / 代码
-- Code identifiers, comments, and strings are English only.  
-  代码中的标识符、注释与字符串仅使用英文。
-- Prefer clear, explicit naming over abbreviations.  
-  命名清晰明确，避免缩写。
-- Add short comments only when logic is non-obvious.  
-  仅在逻辑不直观时添加简短注释。
+Code
+- Code identifiers, comments, and strings are English only.
+- Prefer clear, explicit naming over abbreviations.
+- Add short comments only when logic is non-obvious.
 
-File Naming / 文件命名
-- Use English, kebab-case for docs: `design-spec_v0.1.md`.  
-  文档使用英文与 kebab-case：`design-spec_v0.1.md`。
-- Avoid non-ASCII characters in paths.  
-  路径中避免非 ASCII 字符。
+Architecture & Design Principles
+- Keep code and architecture minimal and concise.
+- Avoid fallback measures; prioritize stable execution of normal flows.
+- Avoid backward compatibility; always optimize in a fresh new way.
+- Design for the happy path first, handle edge cases explicitly only when necessary.
+
+Configuration Management
+- All configuration parameters MUST be explicitly defined in config.yml or environment variables.
+- DO NOT use hardcoded values, default values, or fallback parameters in code.
+- If a required configuration parameter is missing or cannot be read, the system MUST fail immediately with a clear error message.
+- Configuration loading must be strict: no implicit defaults, no silent fallbacks.
+- Follow the pattern in src/llm/config.py: explicit parameter checking, immediate failure on missing values.
+- Example: Use `data["key"]` instead of `data.get("key", default_value)`.
+
+File Naming
+- Use English, kebab-case for docs: `design-spec_v0.1.md`.
+- Avoid non-ASCII characters in paths.
+
+Directory Organization
+- Place test code and test scripts in `tests/` directory.
+- Place production utility scripts in `scripts/` directory.
