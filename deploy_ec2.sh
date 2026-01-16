@@ -97,7 +97,44 @@ else
     exit 1
 fi
 
-print_step "2. Preparing deployment package"
+print_step "2. Syncing database from server"
+# Create local data directory if it doesn't exist
+mkdir -p data
+
+# Check if database exists on server
+print_info "Checking for existing database on server..."
+if ssh -i "$SSH_KEY" $SSH_OPTIONS "$SSH_USER@$IP_ADDRESS" "[ -f /opt/zenai/data/zenai.db ]" 2>/dev/null; then
+    print_info "Database found on server, downloading..."
+    
+    # Backup local database if it exists
+    if [ -f "data/zenai.db" ]; then
+        BACKUP_NAME="data/zenai.db.backup.$(date +%Y%m%d_%H%M%S)"
+        cp "data/zenai.db" "$BACKUP_NAME"
+        print_info "Local database backed up to: $BACKUP_NAME"
+    fi
+    
+    # Download database from server
+    if scp -i "$SSH_KEY" $SSH_OPTIONS "$SSH_USER@$IP_ADDRESS:/opt/zenai/data/zenai.db" "data/zenai.db"; then
+        print_success "Database synced from server"
+        
+        # Show database info
+        if command -v sqlite3 &> /dev/null; then
+            RECORD_COUNT=$(sqlite3 data/zenai.db "SELECT COUNT(*) FROM resonance_records;" 2>/dev/null || echo "N/A")
+            print_info "Database contains $RECORD_COUNT resonance records"
+        fi
+    else
+        print_warn "Failed to download database, will use local version if available"
+    fi
+else
+    print_info "No database found on server (this is normal for first deployment)"
+    if [ -f "data/zenai.db" ]; then
+        print_info "Will use existing local database"
+    else
+        print_info "A new database will be created on first use"
+    fi
+fi
+
+print_step "3. Preparing deployment package"
 # Create temporary deployment directory
 TEMP_DIR=$(mktemp -d)
 trap "rm -rf $TEMP_DIR" EXIT
@@ -113,6 +150,12 @@ cp config.yml "$TEMP_DIR/"
 cp .env "$TEMP_DIR/_env"
 cp start.sh "$TEMP_DIR/"
 
+# Copy database if it exists
+if [ -d "data" ]; then
+    cp -r data "$TEMP_DIR/"
+    print_info "Database included in deployment package"
+fi
+
 # Create deployment archive
 cd "$TEMP_DIR"
 tar -czf zenai-deploy.tar.gz *
@@ -120,11 +163,11 @@ cd - > /dev/null
 
 print_success "Deployment package created"
 
-print_step "3. Uploading files to EC2"
+print_step "4. Uploading files to EC2"
 scp -i "$SSH_KEY" $SSH_OPTIONS "$TEMP_DIR/zenai-deploy.tar.gz" "$SSH_USER@$IP_ADDRESS:~/"
 print_success "Files uploaded"
 
-print_step "4. Installing dependencies and configuring service"
+print_step "5. Installing dependencies and configuring service"
 ssh -i "$SSH_KEY" $SSH_OPTIONS "$SSH_USER@$IP_ADDRESS" << 'ENDSSH'
 set -e
 
@@ -134,12 +177,23 @@ sudo yum install -y python3.11 python3.11-pip git
 
 echo "==> Creating deployment directory"
 sudo mkdir -p /opt/zenai
+sudo mkdir -p /opt/zenai/data
 sudo chown -R ec2-user:ec2-user /opt/zenai
+
+echo "==> Backing up existing database (if any)"
+if [ -f "/opt/zenai/data/zenai.db" ]; then
+    BACKUP_NAME="/opt/zenai/data/zenai.db.backup.$(date +%Y%m%d_%H%M%S)"
+    cp /opt/zenai/data/zenai.db "$BACKUP_NAME"
+    echo "✓ Database backed up to: $BACKUP_NAME"
+fi
 
 echo "==> Extracting deployment package"
 cd /opt/zenai
 tar -xzf ~/zenai-deploy.tar.gz
 rm ~/zenai-deploy.tar.gz
+
+echo "==> Ensuring data directory exists"
+mkdir -p /opt/zenai/data
 
 echo "==> Setting up environment file"
 if [ -f "/opt/zenai/_env" ]; then
@@ -211,7 +265,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-print_step "5. Configuring Nginx for API integration"
+print_step "6. Configuring Nginx for API integration"
 ssh -i "$SSH_KEY" $SSH_OPTIONS "$SSH_USER@$IP_ADDRESS" << 'ENDSSH'
 set -e
 
@@ -297,7 +351,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-print_step "6. Verifying deployment"
+print_step "7. Verifying deployment"
 sleep 2
 
 # Test internal API endpoint

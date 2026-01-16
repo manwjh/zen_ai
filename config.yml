@@ -15,9 +15,9 @@ paths:
 # Scheduler Configuration / 调度器配置
 # ==============================================
 scheduler:
-  time_window_hours: 0.02     # Time window for iteration trigger / 迭代触发时间窗口 (约72秒，测试用)
-  min_interactions: 30        # Minimum interactions required / 最小交互数要求
-  check_interval_minutes: 0.5 # How often to check trigger conditions / 检查触发条件的间隔 (30秒，测试用)
+  time_window_hours: 6        # Time window for iteration trigger / 迭代触发时间窗口 (约72秒，测试用)
+  min_interactions: 100       # Minimum interactions required / 最小交互数要求
+  check_interval_minutes: 30  # How often to check trigger conditions / 检查触发条件的间隔 (30秒，测试用)
 
 # ==============================================
 # Initial Prompt Policy / 初始提示词策略
