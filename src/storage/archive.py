@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Sequence
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, attributes
 
 from ..core.models import Interaction, IterationMetrics
 from .database import (
@@ -72,12 +72,27 @@ class ResonanceArchive:
         self,
         interaction_id: int,
         feedback: str,
+        feedback_data: dict[str, Any] | None = None,
     ) -> None:
-        """Update feedback for an existing interaction"""
+        """
+        Update feedback for an existing interaction
+        
+        Args:
+            interaction_id: Interaction ID
+            feedback: Standard feedback type (resonance/rejection/ignore)
+            feedback_data: Additional feedback data (behavior, comment, etc.)
+        """
         with self.create_session() as session:
             record = session.query(InteractionRecord).filter_by(id=interaction_id).first()
             if record:
                 record.feedback = feedback
+                # Merge feedback_data into existing extra_data
+                if feedback_data:
+                    existing_data = record.extra_data or {}
+                    existing_data.update(feedback_data)
+                    record.extra_data = existing_data
+                    # Mark the JSON field as modified so SQLAlchemy tracks it
+                    attributes.flag_modified(record, 'extra_data')
                 session.commit()
 
     def load_interactions_by_iteration(
@@ -113,6 +128,27 @@ class ResonanceArchive:
             )
             return [self._record_to_interaction(record) for record in records]
 
+    def assign_interactions_to_iteration(
+        self,
+        iteration_id: int,
+        interactions: list[int],
+    ) -> None:
+        """
+        Assign interactions to an iteration.
+        
+        Args:
+            iteration_id: Iteration ID
+            interactions: List of interaction IDs to assign
+        """
+        with self.create_session() as session:
+            session.query(InteractionRecord).filter(
+                InteractionRecord.id.in_(interactions)
+            ).update(
+                {InteractionRecord.iteration_id: iteration_id},
+                synchronize_session=False
+            )
+            session.commit()
+    
     def load_unassigned_interactions(self) -> Sequence[Interaction]:
         """Load interactions not yet assigned to an iteration"""
         with self.create_session() as session:
@@ -189,6 +225,85 @@ class ResonanceArchive:
         """Get specific iteration by ID"""
         with self.create_session() as session:
             return session.query(IterationSession).filter_by(id=iteration_id).first()
+
+    # ========================================
+    # Gatha Management
+    # ========================================
+
+    def save_gatha(
+        self,
+        iteration_id: int,
+        gatha_data: dict[str, Any],
+    ) -> None:
+        """
+        Save complete gatha data for an iteration.
+        
+        All gatha-related data stored in gatha_metadata JSON field.
+        所有偈子相关数据存储在 gatha_metadata JSON 字段中。
+        
+        Args:
+            iteration_id: Iteration ID
+            gatha_data: Complete gatha data dict containing:
+                {
+                    "gatha": str,              # The verse text
+                    "explanation": str,        # Plain language explanation
+                    "questions_count": int,
+                    "generation_time": float,
+                    "resonance_ratio": float,
+                    "state": str,
+                    "timestamp": str,
+                    "audio_generated": bool,
+                    "audio_path": str|None,
+                    ...
+                }
+        """
+        with self.create_session() as session:
+            iteration = session.query(IterationSession).filter_by(id=iteration_id).first()
+            if iteration:
+                iteration.gatha_metadata = gatha_data
+                session.commit()
+    
+    def get_gatha(self, iteration_id: int) -> dict[str, Any] | None:
+        """
+        Get complete gatha data for a specific iteration.
+        
+        Returns:
+            Complete gatha data dict, or None if not found
+        """
+        with self.create_session() as session:
+            iteration = session.query(IterationSession).filter_by(id=iteration_id).first()
+            if iteration and iteration.gatha_metadata:
+                return iteration.gatha_metadata
+            return None
+    
+    def get_all_gathas(self, limit: int = 10) -> list[dict[str, Any]]:
+        """
+        Get recent gathas with their complete data.
+        
+        Args:
+            limit: Maximum number of gathas to return
+            
+        Returns:
+            List of dicts containing complete gatha data
+        """
+        with self.create_session() as session:
+            iterations = (
+                session.query(IterationSession)
+                .filter(IterationSession.gatha_metadata.isnot(None))
+                .order_by(IterationSession.id.desc())
+                .limit(limit)
+                .all()
+            )
+            return [
+                {
+                    "iteration_id": it.id,
+                    "end_time": it.end_time.isoformat() if it.end_time else None,
+                    "state": it.state,
+                    "metrics": it.metrics,
+                    **it.gatha_metadata,  # Unpack complete gatha data
+                }
+                for it in iterations
+            ]
 
     # ========================================
     # Metrics Management

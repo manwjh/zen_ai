@@ -41,9 +41,15 @@ class IterationScheduler:
     Pure coordination layer - delegates computation to Trainer (修炼者).
     纯调度层 - 将计算委托给修炼者。
     
+    Philosophy:
+    - Trigger based on interaction accumulation, not time
+    - The Trainer practices when ready, not on a schedule
+    - 基于交互积累触发，而非时间
+    - 修炼者在准备好时修炼，而非按时间表
+    
     Responsibilities:
     - Monitor interaction accumulation
-    - Trigger iterations at appropriate times
+    - Trigger iterations when sufficient data accumulated
     - Coordinate Trainer and Orator
     - Handle safety checks and system control
     
@@ -72,8 +78,11 @@ class IterationScheduler:
 
     def start(self) -> None:
         """Start the scheduler"""
-        # Initialize first iteration
-        self._start_new_iteration()
+        # Check immediately if conditions are already met
+        # 如果启动时条件已满足，立即触发第一次迭代
+        if self.should_trigger_iteration():
+            print("\n[Scheduler] Sufficient unassigned interactions found at startup. Triggering first iteration immediately...")
+            self.run_iteration_cycle()
         
         # Schedule periodic checks
         self.scheduler.add_job(
@@ -84,7 +93,7 @@ class IterationScheduler:
         )
         
         self.scheduler.start()
-        print(f"Scheduler started. Checking every {self.config.check_interval_minutes} minutes.")
+        print(f"[Scheduler] Started. Checking every {self.config.check_interval_minutes} minutes.")
 
     def stop(self) -> None:
         """Stop the scheduler"""
@@ -95,25 +104,19 @@ class IterationScheduler:
         """
         Check if conditions are met to trigger an iteration.
         
-        Conditions:
-        - Time window elapsed (default 24 hours)
-        - Minimum interactions met (default 1000)
+        Pure approach: Trigger when sufficient unassigned interactions accumulated.
+        纯粹方法：当积累足够未分配的交互数据时触发。
+        
+        Condition:
+        - Minimum unassigned interactions met (default 100)
+        
+        The Trainer practices when ready, not on a fixed schedule.
+        修炼者在准备好时修炼，而非按固定时间表。
         """
-        if not self.current_iteration_start:
-            return True
-
-        # Check time window
-        elapsed = datetime.utcnow() - self.current_iteration_start
-        time_window = timedelta(hours=self.config.time_window_hours)
-        time_elapsed = elapsed >= time_window
-
-        # Check interaction count
-        interaction_count = self.archive.get_interaction_count(
-            start_time=self.current_iteration_start,
-        )
-        min_interactions_met = interaction_count >= self.config.min_interactions
-
-        return time_elapsed and min_interactions_met
+        # Count unassigned interactions (not yet processed by any iteration)
+        unassigned = self.archive.load_unassigned_interactions()
+        
+        return len(unassigned) >= self.config.min_interactions
 
     def run_iteration_cycle(self) -> None:
         """
@@ -140,29 +143,50 @@ class IterationScheduler:
             self.stop()
             return
 
-        # Quick check for interactions
-        current_interactions = self.archive.load_interactions_by_time_window(
-            start_time=self.current_iteration_start or datetime.utcnow(),
-        )
-
-        if not current_interactions:
-            print("[Scheduler] No interactions found in current window. Skipping iteration.")
-            return
-
-        # Create iteration record
+        # Load unassigned interactions (not yet processed by any iteration)
+        from ..storage.database import InteractionRecord
+        with self.archive.create_session() as session:
+            records = (
+                session.query(InteractionRecord)
+                .filter_by(iteration_id=None)
+                .order_by(InteractionRecord.timestamp)
+                .all()
+            )
+            
+            if not records:
+                print("[Scheduler] No unassigned interactions found. Skipping iteration.")
+                return
+            
+            print(f"[Scheduler] Found {len(records)} unassigned interactions")
+            
+            # Extract data we need from records before session closes
+            record_ids = [r.id for r in records]
+            start_time = records[0].timestamp  # Already sorted by timestamp
+            end_time = records[-1].timestamp
+        
+        # Convert to Interaction objects for processing (outside session)
+        unassigned_interactions = self.archive.load_unassigned_interactions()
+        
         iteration_id = self.archive.create_iteration(
-            start_time=self.current_iteration_start or datetime.utcnow(),
+            start_time=start_time,
             prompt_version=self.orator.get_current_prompt_version(),
         )
 
         print(f"[Scheduler] Created iteration {iteration_id}")
 
         try:
+            # Assign unassigned interactions to this iteration
+            self.archive.assign_interactions_to_iteration(
+                interaction_ids=record_ids,
+                iteration_id=iteration_id,
+            )
+            print(f"[Scheduler] Assigned {len(record_ids)} interactions to iteration {iteration_id}")
+
             # Delegate to Trainer (修炼者) for computation and evolution
             result = self.trainer.run_iteration_cycle(
                 iteration_id=iteration_id,
-                start_time=self.current_iteration_start or datetime.utcnow(),
-                end_time=datetime.utcnow(),
+                start_time=start_time,
+                end_time=end_time,
             )
 
             # Complete iteration in archive
@@ -186,8 +210,7 @@ class IterationScheduler:
                 self.stop()
                 return
 
-            # Start next iteration
-            self._start_new_iteration()
+            # No need to call _start_new_iteration() - we use unassigned interactions
 
         except Exception as exc:
             print(f"[Scheduler] ERROR during iteration cycle: {exc}")
@@ -197,7 +220,7 @@ class IterationScheduler:
             self.archive.complete_iteration(
                 iteration_id=iteration_id,
                 end_time=datetime.utcnow(),
-                total_interactions=len(current_interactions),
+                total_interactions=len(unassigned_interactions),
                 state="dead",
                 metrics={},
             )
@@ -211,11 +234,6 @@ class IterationScheduler:
         if self.should_trigger_iteration():
             print("\nIteration trigger conditions met. Starting iteration cycle...")
             self.run_iteration_cycle()
-
-    def _start_new_iteration(self) -> None:
-        """Initialize a new iteration period"""
-        self.current_iteration_start = datetime.utcnow()
-        print(f"New iteration period started at {self.current_iteration_start}")
 
     def force_iteration(self) -> None:
         """Manually trigger an iteration cycle"""

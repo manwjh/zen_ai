@@ -17,6 +17,7 @@ from ..core import (
 )
 from ..core.state import StateThresholds
 from ..storage import ResonanceArchive
+from .gatha_generator import GathaGenerator
 
 
 @dataclass
@@ -41,6 +42,7 @@ class ZenAiTrainer:
     - Compute metrics from interactions
     - Evaluate system state
     - Evolve prompt policy
+    - Generate gatha (Buddhist verse) reflecting on user questions
     - NO direct interaction with users (that's Orator's job)
     
     Represents "不立文字" (no establishment of words) - the Zen principle
@@ -50,12 +52,24 @@ class ZenAiTrainer:
     archive: ResonanceArchive
     thresholds: StateThresholds
     rules: EvolutionRules
+    gatha_generator: GathaGenerator | None = None
     
     @classmethod
     def from_config(cls, archive: ResonanceArchive, config) -> ZenAiTrainer:
         """Create Trainer from configuration"""
         from ..core.state import StateThresholds
         from ..core.evolution import EvolutionRules
+        from ..llm.config import load_llm_config
+        
+        # Initialize gatha generator
+        gatha_generator = None
+        try:
+            llm_config = load_llm_config()
+            gatha_generator = GathaGenerator.from_config(llm_config)
+            print("[Trainer] Gatha generator initialized")
+        except Exception as e:
+            print(f"[Trainer] Warning: Could not initialize gatha generator: {e}")
+            print("[Trainer] Gatha generation will be disabled")
         
         return cls(
             archive=archive,
@@ -97,6 +111,7 @@ class ZenAiTrainer:
                 min_temperature=config.evolution_rules.min_temperature,
                 max_temperature=config.evolution_rules.max_temperature,
             ),
+            gatha_generator=gatha_generator,
         )
     
     def compute_iteration_metrics(
@@ -229,6 +244,45 @@ class ZenAiTrainer:
             new_prompt_version = new_version
             evolution_actions = actions
             print(f"[Trainer] New prompt version {new_version} saved.")
+        
+        # ========================================
+        # Generate Gatha and Explanation (偈子与解释稿)
+        # ========================================
+        if self.gatha_generator:
+            try:
+                print(f"[Trainer] Generating gatha and explanation for iteration {iteration_id}...")
+                gatha_data = self.gatha_generator.generate_gatha(
+                    interactions=current_interactions,
+                    metrics=metrics,
+                    state=state,
+                )
+                
+                # Save complete gatha data to archive
+                self.archive.save_gatha(
+                    iteration_id=iteration_id,
+                    gatha_data=gatha_data,
+                )
+                
+                print(f"[Trainer] Gatha and explanation generated:")
+                print(f"\n{'─' * 40}")
+                print(f"偈子：")
+                print(gatha_data.get("gatha", ""))
+                print(f"\n解释稿：")
+                explanation = gatha_data.get("explanation", "")
+                # Truncate long explanation for console
+                if len(explanation) > 200:
+                    print(explanation[:200] + "...")
+                else:
+                    print(explanation)
+                print(f"{'─' * 40}\n")
+                print(f"[Trainer] Questions: {gatha_data.get('questions_count', 0)}, "
+                      f"Generation time: {gatha_data.get('generation_time', 0):.2f}s")
+                
+            except Exception as e:
+                print(f"[Trainer] Warning: Failed to generate gatha: {e}")
+                # Don't fail the entire iteration if gatha generation fails
+        else:
+            print(f"[Trainer] Gatha generator not available, skipping.")
         
         return TrainerIterationResult(
             iteration_id=iteration_id,

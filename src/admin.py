@@ -11,6 +11,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from . import __version__
 from .config import load_config
 from .core.models import PromptPolicy
 from .core.prompt import render_prompt
@@ -32,7 +33,8 @@ def cmd_status(args):
     print("\n" + "=" * 60)
     print("ZenAi System Status / ZenAi 系统状态")
     print("=" * 60)
-    print(f"\nTimestamp: {metrics.timestamp}")
+    print(f"\nSystem Version: {__version__}")
+    print(f"Timestamp: {metrics.timestamp}")
     print(f"\nSystem State / 系统状态:")
     print(f"  Current State: {metrics.current_state}")
     print(f"  Prompt Version: {metrics.prompt_version}")
@@ -160,6 +162,170 @@ def cmd_export(args):
     print(f"Metrics exported to {args.output}")
 
 
+def cmd_gathas(args):
+    """View gatha history with explanations"""
+    archive = ResonanceArchive(db_path=args.db_path)
+    gathas = archive.get_all_gathas(limit=args.limit)
+    
+    if not gathas:
+        print("\n" + "=" * 60)
+        print("No gathas found. / 未找到偈子。")
+        print("=" * 60 + "\n")
+        print("Gathas are generated after each iteration cycle.")
+        print("偈子在每次迭代周期后生成。")
+        return
+    
+    print("\n" + "=" * 60)
+    print("Gatha History / 偈子历史")
+    print("=" * 60 + "\n")
+    
+    for g in gathas:
+        iteration_id = g["iteration_id"]
+        end_time = g.get("end_time") or "N/A"
+        state = g["state"]
+        gatha = g.get("gatha", "")
+        explanation = g.get("explanation", "")
+        metrics = g["metrics"]
+        
+        print(f"[Iteration {iteration_id}] {end_time}")
+        print(f"State: {state}", end="")
+        
+        if metrics:
+            rr = metrics.get("resonance_ratio", 0)
+            rd = metrics.get("rejection_density", 0)
+            print(f" | RR: {rr:.2%} | RD: {rd:.2%}", end="")
+        
+        q_count = g.get("questions_count", 0)
+        gen_time = g.get("generation_time", 0)
+        print(f" | Questions: {q_count} | Gen: {gen_time:.2f}s")
+        
+        print("\n【偈子】")
+        print(gatha)
+        
+        if explanation and args.verbose:
+            print("\n【解释稿】")
+            print(explanation)
+        elif explanation:
+            # Show truncated explanation
+            if len(explanation) > 100:
+                print(f"\n【解释稿】{explanation[:100]}...")
+            else:
+                print(f"\n【解释稿】{explanation}")
+            print("(使用 --verbose 查看完整解释)")
+        
+        print()
+        print("─" * 60 + "\n")
+
+
+def cmd_iterate(args):
+    """Manually trigger an iteration cycle"""
+    from datetime import datetime, timedelta
+    from .config import load_config
+    from .trainer import ZenAiTrainer
+    from .orator import ZenAiOrator
+    from .llm.config import load_llm_config
+    
+    print("\n" + "=" * 60)
+    print("Manual Iteration Trigger / 手动触发迭代")
+    print("=" * 60 + "\n")
+    
+    # Load configuration
+    config = load_config(args.config)
+    db_path = args.db_path or config.paths.database
+    
+    # Initialize components
+    archive = ResonanceArchive(db_path=db_path)
+    
+    # Check interaction count
+    total_interactions = archive.get_interaction_count()
+    print(f"Total interactions in database: {total_interactions}")
+    
+    if total_interactions < config.scheduler.min_interactions:
+        print(f"⚠️  Insufficient interactions: {total_interactions} < {config.scheduler.min_interactions}")
+        print("Cannot trigger iteration. More data needed.")
+        return 1
+    
+    # Get latest iteration
+    latest_iteration = archive.get_latest_iteration()
+    if latest_iteration:
+        print(f"Latest iteration: {latest_iteration.id} at {latest_iteration.end_time}")
+        start_time = latest_iteration.end_time
+    else:
+        print("No previous iterations. This will be the first iteration.")
+        start_time = datetime.utcnow() - timedelta(days=365)  # Include all historical data
+    
+    # Count interactions since last iteration
+    interactions_since = archive.get_interaction_count(start_time=start_time)
+    print(f"Interactions since last iteration: {interactions_since}")
+    
+    if interactions_since < config.scheduler.min_interactions:
+        print(f"⚠️  Insufficient new interactions: {interactions_since} < {config.scheduler.min_interactions}")
+        if not args.force:
+            print("Use --force to trigger anyway.")
+            return 1
+        print("Forcing iteration anyway (--force)...")
+    
+    # Initialize Trainer and Orator
+    print("\nInitializing Trainer and Orator...")
+    trainer = ZenAiTrainer.from_config(archive, config)
+    
+    llm_config = load_llm_config()
+    orator = ZenAiOrator(llm_config=llm_config, archive=archive)
+    
+    # Create iteration record
+    print("\nCreating iteration record...")
+    iteration_id = archive.create_iteration(
+        start_time=start_time,
+        prompt_version=orator.get_current_prompt_version(),
+    )
+    
+    print(f"Created iteration {iteration_id}")
+    
+    try:
+        # Run iteration cycle
+        print("\nRunning iteration cycle...")
+        result = trainer.run_iteration_cycle(
+            iteration_id=iteration_id,
+            start_time=start_time,
+            end_time=datetime.utcnow(),
+        )
+        
+        # Complete iteration
+        archive.complete_iteration(
+            iteration_id=iteration_id,
+            end_time=datetime.utcnow(),
+            total_interactions=result.metrics.total_responses,
+            state=result.state.value,
+            metrics=result.metrics.to_dict(),
+        )
+        
+        print(f"\n✓ Iteration {iteration_id} completed successfully!")
+        print(f"  State: {result.state.value}")
+        print(f"  Total interactions: {result.metrics.total_responses}")
+        print(f"  Resonance ratio: {result.metrics.resonance_ratio:.2%}")
+        
+        if result.new_prompt_version:
+            print(f"  New prompt version: {result.new_prompt_version}")
+        
+        print("\n" + "=" * 60 + "\n")
+        return 0
+        
+    except Exception as e:
+        print(f"\n✗ Iteration failed: {e}")
+        import traceback
+        traceback.print_exc()
+        
+        # Mark as failed
+        archive.complete_iteration(
+            iteration_id=iteration_id,
+            end_time=datetime.utcnow(),
+            total_interactions=interactions_since,
+            state="dead",
+            metrics={},
+        )
+        return 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     # Load config to get database path (no hardcoded defaults)
     config = load_config()
@@ -234,6 +400,28 @@ def build_parser() -> argparse.ArgumentParser:
         help="Output JSON file path",
     )
     
+    # gathas
+    gathas_parser = subparsers.add_parser("gathas", help="View gatha history with explanations")
+    gathas_parser.add_argument(
+        "--limit",
+        type=int,
+        default=10,
+        help="Number of gathas to show (default: 10)",
+    )
+    gathas_parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Show full explanation text",
+    )
+    
+    # iterate
+    iterate_parser = subparsers.add_parser("iterate", help="Manually trigger an iteration cycle")
+    iterate_parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Force iteration even if insufficient new interactions",
+    )
+    
     return parser
 
 
@@ -259,6 +447,8 @@ def main() -> int:
         "history": cmd_history,
         "prompts": cmd_prompts,
         "export": cmd_export,
+        "gathas": cmd_gathas,
+        "iterate": cmd_iterate,
     }
     
     return commands[args.command](args) or 0

@@ -26,3 +26,6 @@ pytest-asyncio>=0.23.0
 pytest-mock>=3.12.0
 httpx>=0.26.0  # For testing FastAPI
 aiohttp>=3.9.0  # For async HTTP requests
+
+# Language Detection / 语言检测
+langdetect>=1.0.9

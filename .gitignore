@@ -51,3 +51,25 @@ htmlcov/
 
 # Logs
 *.log
+
+# Database and data files
+data/
+*.db
+*.db.backup*
+*.db-journal
+
+# Configuration with secrets
+config.yml
+config.yaml
+*.local.yml
+*.local.yaml
+
+# Reports and logs
+reports/
+logs/
+*.log
+*.pid
+
+# Test outputs
+test_*.json
+batch_test_results.json

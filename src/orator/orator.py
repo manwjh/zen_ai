@@ -44,6 +44,7 @@ class ZenAiOrator:
         self,
         user_input: str,
         metadata: dict[str, Any] | None = None,
+        language: str = 'en',
     ) -> OratorResponse:
         """
         Execute inference and return response.
@@ -54,6 +55,11 @@ class ZenAiOrator:
         3. Detect refusal patterns
         4. Record interaction to archive
         5. Return response with tracking ID
+        
+        Args:
+            user_input: User's question
+            metadata: Optional metadata
+            language: Response language (zh, zh-tw, en, ja, ko)
         """
         # Load latest prompt
         prompt_record = self.archive.get_latest_prompt()
@@ -64,10 +70,24 @@ class ZenAiOrator:
         prompt_version = prompt_record.version
         policy = prompt_record.policy
 
+        # Language instructions for response
+        language_instructions = {
+            'zh': '请用简体中文回答。',
+            'zh-tw': '請用繁體中文回答。',
+            'en': 'Please respond in English.',
+            'ja': '日本語で答えてください。',
+            'ko': '한국어로 답변해 주세요.',
+        }
+        
+        lang_instruction = language_instructions.get(language, language_instructions['en'])
+        
+        # Append language instruction to user input
+        full_user_input = f"{user_input}\n\n{lang_instruction}"
+
         # Build messages
         messages = [
             LlmMessage(role="system", content=prompt_text),
-            LlmMessage(role="user", content=user_input),
+            LlmMessage(role="user", content=full_user_input),
         ]
 
         # Execute LLM inference
@@ -91,14 +111,17 @@ class ZenAiOrator:
         else:
             refusal = self._detect_refusal(response_text, policy)
 
-        # Record interaction
+        # Record interaction with language metadata
+        enriched_metadata = metadata or {}
+        enriched_metadata['language'] = language  # 保存用户使用的语言
+        
         interaction_id = self.archive.record_interaction(
             user_input=user_input,
             response_text=response_text,
             feedback=None,  # Feedback comes later
             refusal=refusal,
             iteration_id=self.current_iteration_id,
-            metadata=metadata or {},
+            metadata=enriched_metadata,
         )
 
         return OratorResponse(
@@ -127,6 +150,79 @@ class ZenAiOrator:
             interaction_id=interaction_id,
             feedback=feedback,
         )
+
+    def explain_zen_answer(
+        self,
+        question: str,
+        zen_answer: str,
+        language: str = 'en',
+    ) -> str:
+        """
+        Use LLM to provide a plain language explanation of a Zen answer.
+        
+        This creates a separate, explanatory response that helps users
+        understand the meaning behind the Zen-style answer.
+        
+        Supports multiple languages: zh, zh-tw, en, ja, ko
+        """
+        # Unified Chinese system prompt
+        system_prompt = """你是一位禅学解说者，擅长用简单易懂的白话来解释禅语的深层含义。
+
+你的任务是：
+1. 站在提问者的角度，理解他们为什么会有这个困惑
+2. 用通俗易懂的语言解释禅语想要点出的是什么
+3. 保持简洁，控制在150字以内
+4. 避免说教和心灵鸡汤，不要用"真正的xxx"、"只要xxx就能xxx"这类话术
+
+解释风格：
+- 从提问者的视角出发，理解他们的纠结点
+- 用日常生活的例子，而非抽象道理
+- 点破即可，不要给答案或建议
+- 真诚、接地气，避免空洞的励志语言"""
+        
+        # Language instructions for response
+        language_instructions = {
+            'zh': '请用简体中文回答。',
+            'zh-tw': '請用繁體中文回答。',
+            'en': 'Please respond in English.',
+            'ja': '日本語で答えてください。',
+            'ko': '한국어로 답변해 주세요.',
+        }
+        
+        lang_instruction = language_instructions.get(language, language_instructions['en'])
+        
+        # Build user prompt
+        user_prompt = f"""问题：{question}
+
+禅的回答：{zen_answer}
+
+请用白话解释这个禅语的含义。
+
+{lang_instruction}"""
+
+        messages = [
+            LlmMessage(role="system", content=system_prompt),
+            LlmMessage(role="user", content=user_prompt),
+        ]
+
+        try:
+            explanation = send_chat_completion(
+                config=self.llm_config,
+                messages=messages,
+                temperature=0.7,
+                max_tokens=300,
+            )
+            return explanation
+        except Exception as exc:
+            # Return language-specific fallback messages
+            fallback_messages = {
+                'zh': "禅意深远，需要静心体会。每个人的理解可能不同，这正是禅的魅力所在。",
+                'zh-tw': "禪意深遠，需要靜心體會。每個人的理解可能不同，這正是禪的魅力所在。",
+                'en': "Zen meanings are profound and require quiet contemplation. Each person may understand differently—that is the charm of Zen.",
+                'ja': "禅の意味は深く、静かな瞑想が必要です。人それぞれ理解が異なる—それが禅の魅力です。",
+                'ko': "선의 의미는 깊어서 조용한 명상이 필요합니다. 각자 이해가 다를 수 있습니다—그것이 선의 매력입니다."
+            }
+            return fallback_messages.get(language, fallback_messages['en'])
 
     def set_current_iteration(self, iteration_id: int) -> None:
         """Update current iteration ID for new interactions"""

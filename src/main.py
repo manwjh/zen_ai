@@ -56,13 +56,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--iteration-hours",
         type=int,
         default=None,
-        help=f"Iteration time window in hours (default: {config.scheduler.time_window_hours})",
+        help=f"[DEPRECATED] No longer used - iterations trigger on interaction count only",
     )
     parser.add_argument(
         "--min-interactions",
         type=int,
         default=None,
-        help=f"Minimum interactions per iteration (default: {config.scheduler.min_interactions})",
+        help=f"Trigger iteration when this many interactions accumulated (default: {config.scheduler.min_interactions})",
     )
     parser.add_argument(
         "--check-interval",
@@ -114,7 +114,7 @@ def main() -> int:
     print(f"Config: {args.config}")
     print(f"Database: {db_path}")
     print(f"API Server: http://{args.host}:{args.port}")
-    print(f"Iteration: Every {iteration_hours}h, min {min_interactions} interactions")
+    print(f"Iteration Trigger: {min_interactions} interactions (pure count-based)")
     print(f"Check Interval: {check_interval} minutes")
     print(f"Scheduler: {'Enabled' if not args.no_scheduler else 'Disabled'}")
     print("=" * 60)

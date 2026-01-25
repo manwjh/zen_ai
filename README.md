@@ -1,8 +1,15 @@
 # ZenAi - Observable Prompt Evolution System / 可观测提示词演化系统
 
+[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](CHANGELOG.md)
+[![Python](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org)
+[![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
+[![Status](https://img.shields.io/badge/status-Alpha-orange.svg)]()
+
 ZenAi is an observable, rollbackable, human-in-the-loop prompt evolution system, exploring whether language intelligence can stabilize toward a "minimal-attachment" state under continuous feedback.
 
 ZenAi 是一个可观测、可回滚、人工参与的提示词演化系统，用于探索语言智能是否能在持续反馈中走向"最小执念"的稳定状态。
+
+**Current Version / 当前版本**: `0.1.0` (Alpha)
 
 ## 📋 Project Overview / 项目概述
 
@@ -102,7 +109,6 @@ python3 -m src.main --no-scheduler
 # Custom configuration / 自定义配置
 python3 -m src.main \
   --port 8000 \
-  --iteration-hours 24 \
   --min-interactions 1000 \
   --check-interval 60
 ```
@@ -300,9 +306,17 @@ python3 -m src.admin export --output report.json
 
 ### Iteration Configuration / 迭代配置
 
-- **Time Window / 时间窗口**: 24 hours (default)
-- **Min Interactions / 最小交互数**: 1000 (default)
-- **Check Interval / 检查间隔**: 60 minutes (default)
+**Pure Count-Based Trigger / 纯粹基于计数触发**
+
+The system now uses a pure interaction-count based approach:  
+系统现在使用纯粹的交互数量触发方式：
+
+- **Min Interactions / 最小交互数**: 1000 (default) - Triggers iteration when reached  
+  达到此数量时触发迭代
+- **Check Interval / 检查间隔**: 60 minutes (default) - How often to check  
+  检查频率
+- ~~**Time Window**~~: REMOVED - No longer waits for time windows  
+  已移除 - 不再等待时间窗口
 
 ### Evolution Rules / 演化规则
 
@@ -322,6 +336,58 @@ Defined in `src/core/state.py`:
 - STABLE state requirements / 稳定状态要求
 - COLLAPSING detection / 塌缩检测
 - MUTE conditions / 沉默条件
+
+## 🚢 Deployment / 部署
+
+### Deploy to EC2 / 部署到 EC2
+
+```bash
+# Deploy backend to production server
+# 部署后端到生产服务器
+./deploy-backend.sh [IP地址] [域名]
+
+# Example / 示例
+./deploy-backend.sh 51.21.54.93 zenheart.net
+```
+
+For full deployment including frontend:  
+完整部署（包含前端）：
+
+```bash
+cd .. && ./deploy-all.sh
+```
+
+See [Deployment Guide](../DEPLOYMENT_GUIDE.md) for details.  
+详见[部署指南](../DEPLOYMENT_GUIDE.md)。
+
+### Pull Remote Database / 拉取远程数据库
+
+When you need to sync the production database to your local environment:  
+当需要将生产数据库同步到本地环境时：
+
+```bash
+# Pull database from remote server
+# 从远程服务器拉取数据库
+./pull-database.sh [IP地址]
+
+# Example / 示例
+./pull-database.sh 51.21.54.93
+./pull-database.sh  # Uses default IP / 使用默认IP
+```
+
+**Features / 特性**:
+- Automatically backs up local database / 自动备份本地数据库
+- Shows database statistics (record count, size, etc.) / 显示数据库统计信息
+- Preserves all backup files / 保留所有备份文件
+- Safe operation with validation / 安全操作和验证
+
+The script will:  
+脚本将会：
+1. Test SSH connection / 测试SSH连接
+2. Check remote database exists / 检查远程数据库存在
+3. Backup local database if exists / 备份本地数据库（如果存在）
+4. Download remote database / 下载远程数据库
+5. Show statistics and backup history / 显示统计信息和备份历史
 
 ## 🧪 Development / 开发
 
@@ -356,6 +422,8 @@ scheduler.start()
 
 ## 📖 Documentation / 文档
 
+- [CHANGELOG](CHANGELOG.md) - Version history and updates  
+  版本历史和更新日志
 - [Design Specification v0.1](docs/design-spec_v0.1.md) - Complete system design  
   完整系统设计
 - [Token Management v0.1](docs/token-management_v0.1.md) - Environment setup  
@@ -373,6 +441,12 @@ Its practice is not toward awakening, but toward adjudication.
 ## 📄 License / 许可证
 
 See [LICENSE](LICENSE) file.
+
+## 📌 Version History / 版本历史
+
+See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
+
+查看 [CHANGELOG.md](CHANGELOG.md) 了解详细的版本历史。
 
 ## 🙏 Acknowledgments / 致谢
 

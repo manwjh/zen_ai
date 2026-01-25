@@ -43,6 +43,7 @@ class IterationSession(Base):
     state = Column(String(20), nullable=False)  # stable/drifting/collapsing/mute/dead
     metrics = Column(JSON, nullable=False)  # All computed metrics
     prompt_version = Column(Integer, nullable=False)
+    gatha_metadata = Column(JSON, nullable=True)  # All gatha-related data (gatha, explanation, audio, etc.)
 
     def __repr__(self) -> str:
         return (
